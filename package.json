@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "immer": "^11.1.8",
     "msutils": "file:lib/msutils-0.1.0.tgz",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",

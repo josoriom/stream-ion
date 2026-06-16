@@ -1,10 +1,16 @@
+import { memo } from "react";
+import { useAppDispatch } from "../context/context";
+
 interface SampleListProps {
   samples: string[];
   selected_sample: string | null;
-  on_select: (name: string) => void;
 }
 
-export function SampleList({ samples, selected_sample, on_select }: SampleListProps) {
+export const SampleList = memo(function SampleList({
+  samples,
+  selected_sample,
+}: SampleListProps) {
+  const dispatch = useAppDispatch();
   if (samples.length === 0) {
     return <p className="sample-empty">No samples found</p>;
   }
@@ -16,9 +22,9 @@ export function SampleList({ samples, selected_sample, on_select }: SampleListPr
           <li key={name}>
             <button
               type="button"
-              className={is_active ? 'sample-item active' : 'sample-item'}
+              className={is_active ? "sample-item active" : "sample-item"}
               title={name}
-              onClick={() => on_select(name)}
+              onClick={() => dispatch({ type: "pick_sample", name })}
             >
               {name}
             </button>
@@ -27,4 +33,4 @@ export function SampleList({ samples, selected_sample, on_select }: SampleListPr
       })}
     </ul>
   );
-}
+});

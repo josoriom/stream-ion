@@ -1,9 +1,12 @@
+import { memo } from "react";
+import { useAppDispatch } from "../context/context";
+
 interface MzInputProps {
   value: string;
-  on_change: (value: string) => void;
 }
 
-export function MzInput({ value, on_change }: MzInputProps) {
+export const MzInput = memo(function MzInput({ value }: MzInputProps) {
+  const dispatch = useAppDispatch();
   return (
     <label className="mz-input">
       <span className="mz-input-label">Target m/z</span>
@@ -11,8 +14,10 @@ export function MzInput({ value, on_change }: MzInputProps) {
         type="number"
         step="0.0001"
         value={value}
-        onChange={(event) => on_change(event.target.value)}
+        onChange={(event) =>
+          dispatch({ type: "change_mz", value: event.target.value })
+        }
       />
     </label>
   );
-}
+});
