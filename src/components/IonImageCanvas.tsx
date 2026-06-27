@@ -1,15 +1,15 @@
 import { memo, useEffect, useRef } from "react";
-import type { RenderedImage } from "../ms/ion_image";
+import type { RenderedImage } from "../ms/ionImage";
 
 interface IonImageCanvasProps {
   image: RenderedImage;
 }
 
 export const IonImageCanvas = memo(function IonImageCanvas({ image }: IonImageCanvasProps) {
-  const canvas_ref = useRef<HTMLCanvasElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    const canvas = canvas_ref.current;
+    const canvas = canvasRef.current;
     if (!canvas) return;
     canvas.width = image.width;
     canvas.height = image.height;
@@ -20,5 +20,5 @@ export const IonImageCanvas = memo(function IonImageCanvas({ image }: IonImageCa
     context.putImageData(pixels, 0, 0);
   }, [image]);
 
-  return <canvas ref={canvas_ref} className="ion-canvas" />;
+  return <canvas ref={canvasRef} className="ion-canvas" />;
 });

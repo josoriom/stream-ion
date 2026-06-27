@@ -1,19 +1,19 @@
 import { useEffect, useReducer, type ReactNode } from "react";
 import type { SampleFile } from "msutils";
-import { get_samples } from "../ms/list_samples";
-import { open_ion_file } from "../ms/ion_file";
-import { get_eic } from "../ms/eic";
-import { get_peaks } from "../ms/peaks";
-import { request_image, type ImageProgress } from "../ms/image_client";
-import { image_key, image_level, target_tolerance } from "../data/image_targets";
+import { getSamples } from "../ms/listSamples";
+import { openIonFile } from "../ms/ionFile";
+import { getEic } from "../ms/eic";
+import { getPeaks } from "../ms/peaks";
+import { requestImage, type ImageProgress } from "../ms/imageClient";
+import { imageKey, imageLevel, targetTolerance } from "../data/imageTargets";
 import { DispatchContext, StateContext } from "./context";
 import {
-  active_path,
-  initial_state,
-  peak_options,
-  read_error,
+  activePath,
+  initialState,
+  peakOptions,
+  readError,
   reducer,
-  select_view,
+  selectView,
 } from "./reducer";
 
 interface AppProviderProps {
@@ -21,36 +21,36 @@ interface AppProviderProps {
 }
 
 export function AppProvider({ children }: AppProviderProps) {
-  const [state, dispatch] = useReducer(reducer, initial_state);
+  const [state, dispatch] = useReducer(reducer, initialState);
 
-  const { mode, selected_mz, images, samples } = state;
+  const { mode, selectedMz, images, samples } = state;
 
   const {
-    rt_from,
-    rt_to,
+    rtFrom,
+    rtTo,
     ppm,
-    mz_tol,
-    auto_peak_picking,
-    min_intensity,
-    min_integral,
-    min_width,
-    min_snr,
-    auto_noise,
-    auto_baseline,
-    allow_overlap,
+    mzTol,
+    autoPeakPicking,
+    minIntensity,
+    minIntegral,
+    minWidth,
+    minSnr,
+    autoNoise,
+    autoBaseline,
+    allowOverlap,
   } = state;
-  const path = active_path(state);
-  const { url, file, mz, mz_valid, eic_ready, points } = select_view(state);
+  const path = activePath(state);
+  const { url, file, mz, mzValid, eicReady, points } = selectView(state);
 
   useEffect(() => {
     if (samples && samples.path === path) return undefined;
     let active = true;
-    get_samples(path)
+    getSamples(path)
       .then((names) => {
-        if (active) dispatch({ type: "samples_loaded", path, names });
+        if (active) dispatch({ type: "samplesLoaded", path, names });
       })
       .catch((error: unknown) => {
-        if (active) dispatch({ type: "samples_failed", path, message: read_error(error) });
+        if (active) dispatch({ type: "samplesFailed", path, message: readError(error) });
       });
     return () => {
       active = false;
@@ -61,17 +61,17 @@ export function AppProvider({ children }: AppProviderProps) {
     if (mode !== "eic" || !url) return undefined;
     let active = true;
     let opened: SampleFile | null = null;
-    open_ion_file(url)
+    openIonFile(url)
       .then((file) => {
         if (!active) {
           file.dispose?.();
           return;
         }
         opened = file;
-        dispatch({ type: "file_opened", url, file });
+        dispatch({ type: "fileOpened", url, file });
       })
       .catch((error: unknown) => {
-        if (active) dispatch({ type: "file_failed", url, message: read_error(error) });
+        if (active) dispatch({ type: "fileFailed", url, message: readError(error) });
       });
     return () => {
       active = false;
@@ -80,81 +80,81 @@ export function AppProvider({ children }: AppProviderProps) {
   }, [mode, url]);
 
   useEffect(() => {
-    if (!file || !mz_valid) return undefined;
+    if (!file || !mzValid) return undefined;
     const key = `${url}|${mz}`;
     let active = true;
-    get_eic(file, mz, { from: rt_from, to: rt_to }, ppm, mz_tol)
+    getEic(file, mz, { from: rtFrom, to: rtTo }, ppm, mzTol)
       .then((result) => {
-        if (active) dispatch({ type: "eic_ready", key, points: result.points });
+        if (active) dispatch({ type: "eicReady", key, points: result.points });
       })
       .catch((error: unknown) => {
-        if (active) dispatch({ type: "eic_failed", key, message: read_error(error) });
+        if (active) dispatch({ type: "eicFailed", key, message: readError(error) });
       });
     return () => {
       active = false;
     };
-  }, [file, mz, mz_valid, url, rt_from, rt_to, ppm, mz_tol]);
+  }, [file, mz, mzValid, url, rtFrom, rtTo, ppm, mzTol]);
 
   useEffect(() => {
-    if (!auto_peak_picking || !eic_ready) return;
-    const options = peak_options({
-      min_intensity,
-      min_integral,
-      min_width,
-      min_snr,
-      auto_noise,
-      auto_baseline,
-      allow_overlap,
+    if (!autoPeakPicking || !eicReady) return;
+    const options = peakOptions({
+      minIntensity,
+      minIntegral,
+      minWidth,
+      minSnr,
+      autoNoise,
+      autoBaseline,
+      allowOverlap,
     });
-    const list = get_peaks(points, options);
-    dispatch({ type: "peaks_found", key: `${url}|${mz}`, list });
+    const list = getPeaks(points, options);
+    dispatch({ type: "peaksFound", key: `${url}|${mz}`, list });
   }, [
-    auto_peak_picking,
-    eic_ready,
+    autoPeakPicking,
+    eicReady,
     points,
     url,
     mz,
-    min_intensity,
-    min_integral,
-    min_width,
-    min_snr,
-    auto_noise,
-    auto_baseline,
-    allow_overlap,
+    minIntensity,
+    minIntegral,
+    minWidth,
+    minSnr,
+    autoNoise,
+    autoBaseline,
+    allowOverlap,
   ]);
 
   useEffect(() => {
-    if (mode !== "imaging" || !url || selected_mz === null) return undefined;
-    const key = image_key(url, selected_mz);
+    if (mode !== "imaging" || !url || selectedMz === null) return undefined;
+    const key = imageKey(url, selectedMz);
     if (images[key]) return undefined;
 
     let active = true;
-    let last_percent = -1;
-    const on_progress = (progress: ImageProgress) => {
+    let lastPercent = -1;
+    const onProgress = (progress: ImageProgress) => {
       if (!active) return;
       const percent =
         progress.total > 0 ? Math.floor((progress.fetched / progress.total) * 100) : 0;
-      if (percent === last_percent) return;
-      last_percent = percent;
+      if (percent === lastPercent) return;
+      lastPercent = percent;
       dispatch({
-        type: "image_progress",
+        type: "imageProgress",
         fetched: progress.fetched,
         total: progress.total,
         memory: progress.memory,
       });
     };
-    request_image(url, selected_mz, target_tolerance(selected_mz), image_level, on_progress)
+    requestImage(url, selectedMz, targetTolerance(selectedMz), imageLevel, onProgress)
       .then((image) => {
-        if (active) dispatch({ type: "image_ready", url, mz: selected_mz, image });
+        if (active) dispatch({ type: "imageReady", url, mz: selectedMz, image });
       })
       .catch((error: unknown) => {
         if (active)
-          dispatch({ type: "image_failed", url, mz: selected_mz, message: read_error(error) });
+          dispatch({ type: "imageFailed", url, mz: selectedMz, message: readError(error) });
       });
     return () => {
       active = false;
     };
-  }, [mode, url, selected_mz, images]);
+  }, [mode, url, selectedMz, images]);
 
   return (
     <StateContext.Provider value={state}>

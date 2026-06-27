@@ -6,7 +6,7 @@ interface Memory {
   limit: number;
 }
 
-function read_memory(): Memory | null {
+function readMemory(): Memory | null {
   const perf = performance as Performance & {
     memory?: { usedJSHeapSize: number; jsHeapSizeLimit: number };
   };
@@ -18,20 +18,20 @@ function read_memory(): Memory | null {
 }
 
 export const RamMeter = memo(function RamMeter() {
-  const worker_memory = useAppState().image_progress?.memory ?? null;
-  const [main, set_main] = useState<Memory | null>(read_memory);
+  const workerMemory = useAppState().imageProgress?.memory ?? null;
+  const [main, setMain] = useState<Memory | null>(readMemory);
 
   useEffect(() => {
-    const id = window.setInterval(() => set_main(read_memory()), 500);
+    const id = window.setInterval(() => setMain(readMemory()), 500);
     return () => window.clearInterval(id);
   }, []);
 
-  const used = worker_memory ?? main?.used ?? null;
+  const used = workerMemory ?? main?.used ?? null;
   const limit = main?.limit ?? null;
   if (used === null || limit === null) return null;
 
-  const used_mb = Math.round(used / 1048576);
-  const limit_mb = Math.round(limit / 1048576);
+  const usedMb = Math.round(used / 1048576);
+  const limitMb = Math.round(limit / 1048576);
   const percent = Math.min(100, Math.round((used / limit) * 100));
   const over = used > limit;
 
@@ -44,7 +44,7 @@ export const RamMeter = memo(function RamMeter() {
         />
       </div>
       <span className="ram-meter-label">
-        RAM {used_mb} / {limit_mb} MB
+        RAM {usedMb} / {limitMb} MB
       </span>
     </div>
   );

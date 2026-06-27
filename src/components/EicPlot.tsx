@@ -12,15 +12,15 @@ import {
 import type { Point } from "../ms/eic";
 import type { Peak } from "../ms/peaks";
 
-const plot_height = 460;
-const min_width = 320;
-const line_style = { stroke: "#334155", strokeWidth: 1.5 };
-const baseline_style = { stroke: "#ef4444", strokeWidth: 2, strokeDasharray: "6 4" };
-const peak_fill = "rgba(51, 65, 85, 0.16)";
-const peak_stroke = "#334155";
-const annotate_stroke = "#2563eb";
+const plotHeight = 460;
+const minWidth = 320;
+const lineStyle = { stroke: "#334155", strokeWidth: 1.5 };
+const baselineStyle = { stroke: "#ef4444", strokeWidth: 2, strokeDasharray: "6 4" };
+const peakFill = "rgba(51, 65, 85, 0.16)";
+const peakStroke = "#334155";
+const annotateStroke = "#2563eb";
 
-function top_intensity(points: Point[]): number {
+function topIntensity(points: Point[]): number {
   let top = 0;
   for (const point of points) {
     if (point.y > top) top = point.y;
@@ -32,29 +32,29 @@ interface ChartProps {
   points: Point[];
   peaks: Peak[];
   baseline: Point[] | null;
-  annotate_rt: number | null;
+  annotateRt: number | null;
   width: number;
 }
 
-function Chart({ points, peaks, baseline, annotate_rt, width }: ChartProps) {
+function Chart({ points, peaks, baseline, annotateRt, width }: ChartProps) {
   useAxisWheelZoom();
   const zoom = useAxisZoom();
-  const top = useMemo(() => top_intensity(points), [points]);
+  const top = useMemo(() => topIntensity(points), [points]);
 
   return (
-    <Plot width={width} height={plot_height}>
-      <LineSeries data={points} xAxis="x" yAxis="y" lineStyle={line_style} />
-      {baseline && <LineSeries data={baseline} xAxis="x" yAxis="y" lineStyle={baseline_style} />}
+    <Plot width={width} height={plotHeight}>
+      <LineSeries data={points} xAxis="x" yAxis="y" lineStyle={lineStyle} />
+      {baseline && <LineSeries data={baseline} xAxis="x" yAxis="y" lineStyle={baselineStyle} />}
       <Axis id="x" position="bottom" label="Time (min)" displayPrimaryGridLines={false} />
       <Axis id="y" position="left" label="Intensity" displayPrimaryGridLines />
       <Annotations>
-        {annotate_rt !== null && (
+        {annotateRt !== null && (
           <Annotation.Line
-            x1={annotate_rt}
-            x2={annotate_rt}
+            x1={annotateRt}
+            x2={annotateRt}
             y1={0}
             y2={top}
-            color={annotate_stroke}
+            color={annotateStroke}
             strokeDasharray="5 4"
           />
         )}
@@ -65,7 +65,7 @@ function Chart({ points, peaks, baseline, annotate_rt, width }: ChartProps) {
             x2={peak.to}
             y1={0}
             y2={peak.intensity}
-            color={peak_fill}
+            color={peakFill}
           />,
           <Annotation.Line
             key={`apex-${index}`}
@@ -73,7 +73,7 @@ function Chart({ points, peaks, baseline, annotate_rt, width }: ChartProps) {
             x2={peak.rt}
             y1={0}
             y2={peak.intensity}
-            color={peak_stroke}
+            color={peakStroke}
             strokeDasharray="3 3"
           />,
         ])}
@@ -87,39 +87,39 @@ interface EicPlotProps {
   points: Point[];
   peaks: Peak[];
   baseline: Point[] | null;
-  annotate_rt: number | null;
+  annotateRt: number | null;
 }
 
 export const EicPlot = memo(function EicPlot({
   points,
   peaks,
   baseline,
-  annotate_rt,
+  annotateRt,
 }: EicPlotProps) {
   const wrap = useRef<HTMLDivElement>(null);
-  const [width, set_width] = useState(800);
+  const [width, setWidth] = useState(800);
 
   useEffect(() => {
     const node = wrap.current;
     if (!node) return undefined;
     const observer = new ResizeObserver((entries) => {
       const measured = entries[0]?.contentRect.width;
-      if (measured) set_width(Math.max(min_width, Math.floor(measured)));
+      if (measured) setWidth(Math.max(minWidth, Math.floor(measured)));
     });
     observer.observe(node);
     return () => observer.disconnect();
   }, []);
 
-  const has_points = points.length > 0;
+  const hasPoints = points.length > 0;
   return (
     <div ref={wrap} className="plot-wrap">
-      {has_points ? (
+      {hasPoints ? (
         <PlotController>
           <Chart
             points={points}
             peaks={peaks}
             baseline={baseline}
-            annotate_rt={annotate_rt}
+            annotateRt={annotateRt}
             width={width}
           />
         </PlotController>

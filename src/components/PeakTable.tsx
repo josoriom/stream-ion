@@ -5,7 +5,7 @@ interface PeakTableProps {
   peaks: Peak[];
 }
 
-function format_amount(value: number): string {
+function formatAmount(value: number): string {
   return value.toExponential(2);
 }
 
@@ -36,8 +36,8 @@ export const PeakTable = memo(function PeakTable({ peaks }: PeakTableProps) {
               <tr key={index}>
                 <td>{index + 1}</td>
                 <td>{peak.rt.toFixed(3)}</td>
-                <td>{format_amount(peak.intensity)}</td>
-                <td>{format_amount(peak.integral)}</td>
+                <td>{formatAmount(peak.intensity)}</td>
+                <td>{formatAmount(peak.integral)}</td>
                 <td>{peak.from.toFixed(3)}</td>
                 <td>{peak.to.toFixed(3)}</td>
                 <td>{peak.nPoints}</td>

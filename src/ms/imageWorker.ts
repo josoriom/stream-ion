@@ -1,9 +1,9 @@
 import { init, parseIon, getIonImage, type SampleFile } from "msutils";
-import { render_ion_image } from "./ion_image";
-import { to_fetchable } from "./remote";
-import { high_quantile, low_quantile } from "../data/image_targets";
+import { renderIonImage } from "./ionImage";
+import { toFetchable } from "./remote";
+import { highQuantile, lowQuantile } from "../data/imageTargets";
 
-const cache_size = 256 * 1024 * 1024;
+const cacheSize = 256 * 1024 * 1024;
 
 interface Job {
   id: number;
@@ -13,19 +13,19 @@ interface Job {
   level: number;
 }
 
-let open_url: string | null = null;
-let open_file: SampleFile | null = null;
+let openUrl: string | null = null;
+let openFile: SampleFile | null = null;
 let chain: Promise<void> = Promise.resolve();
 
 async function open(url: string): Promise<SampleFile> {
-  if (url !== open_url) {
-    open_file?.dispose?.();
+  if (url !== openUrl) {
+    openFile?.dispose?.();
     await init();
-    const target = new URL(to_fetchable(url), self.location.origin);
-    open_file = await parseIon(target, { maxCacheSize: cache_size });
-    open_url = url;
+    const target = new URL(toFetchable(url), self.location.origin);
+    openFile = await parseIon(target, { maxCacheSize: cacheSize });
+    openUrl = url;
   }
-  return open_file as SampleFile;
+  return openFile as SampleFile;
 }
 
 async function run(job: Job): Promise<void> {
@@ -38,7 +38,7 @@ async function run(job: Job): Promise<void> {
         self.postMessage({ id: job.id, type: "progress", fetched, total, memory: heldBytes });
       },
     });
-    const rendered = render_ion_image(image, low_quantile, high_quantile);
+    const rendered = renderIonImage(image, lowQuantile, highQuantile);
     self.postMessage({ id: job.id, type: "done", image: rendered }, {
       transfer: [rendered.rgba.buffer],
     });

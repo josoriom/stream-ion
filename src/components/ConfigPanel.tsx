@@ -4,7 +4,7 @@ import { useAppDispatch, useAppState } from "../context/context";
 export const ConfigPanel = memo(function ConfigPanel() {
   const state = useAppState();
   const dispatch = useAppDispatch();
-  const [explore, set_explore] = useState(state.mz_text);
+  const [explore, setExplore] = useState(state.mzText);
 
   return (
     <div className="config-panel">
@@ -16,9 +16,9 @@ export const ConfigPanel = memo(function ConfigPanel() {
           <input
             type="number"
             min={0}
-            value={state.min_intensity}
+            value={state.minIntensity}
             onChange={(event) =>
-              dispatch({ type: "set_min_intensity", value: Number(event.target.value) })
+              dispatch({ type: "setMinIntensity", value: Number(event.target.value) })
             }
           />
         </label>
@@ -27,9 +27,9 @@ export const ConfigPanel = memo(function ConfigPanel() {
           <input
             type="number"
             min={0}
-            value={state.min_integral}
+            value={state.minIntegral}
             onChange={(event) =>
-              dispatch({ type: "set_min_integral", value: Number(event.target.value) })
+              dispatch({ type: "setMinIntegral", value: Number(event.target.value) })
             }
           />
         </label>
@@ -38,9 +38,9 @@ export const ConfigPanel = memo(function ConfigPanel() {
           <input
             type="number"
             min={0}
-            value={state.min_width}
+            value={state.minWidth}
             onChange={(event) =>
-              dispatch({ type: "set_min_width", value: Number(event.target.value) })
+              dispatch({ type: "setMinWidth", value: Number(event.target.value) })
             }
           />
         </label>
@@ -49,9 +49,9 @@ export const ConfigPanel = memo(function ConfigPanel() {
           <input
             type="number"
             min={0}
-            value={state.min_snr}
+            value={state.minSnr}
             onChange={(event) =>
-              dispatch({ type: "set_min_snr", value: Number(event.target.value) })
+              dispatch({ type: "setMinSnr", value: Number(event.target.value) })
             }
           />
         </label>
@@ -61,24 +61,24 @@ export const ConfigPanel = memo(function ConfigPanel() {
         <label className="config-check">
           <input
             type="checkbox"
-            checked={state.auto_noise}
-            onChange={() => dispatch({ type: "toggle_auto_noise" })}
+            checked={state.autoNoise}
+            onChange={() => dispatch({ type: "toggleAutoNoise" })}
           />
           <span>Auto noise</span>
         </label>
         <label className="config-check">
           <input
             type="checkbox"
-            checked={state.auto_baseline}
-            onChange={() => dispatch({ type: "toggle_auto_baseline" })}
+            checked={state.autoBaseline}
+            onChange={() => dispatch({ type: "toggleAutoBaseline" })}
           />
           <span>Auto baseline</span>
         </label>
         <label className="config-check">
           <input
             type="checkbox"
-            checked={state.allow_overlap}
-            onChange={() => dispatch({ type: "toggle_allow_overlap" })}
+            checked={state.allowOverlap}
+            onChange={() => dispatch({ type: "toggleAllowOverlap" })}
           />
           <span>Allow overlap</span>
         </label>
@@ -86,23 +86,23 @@ export const ConfigPanel = memo(function ConfigPanel() {
           <input
             type="checkbox"
             checked={state.annotate}
-            onChange={() => dispatch({ type: "toggle_annotate" })}
+            onChange={() => dispatch({ type: "toggleAnnotate" })}
           />
           <span>Annotate</span>
         </label>
         <label className="config-check">
           <input
             type="checkbox"
-            checked={state.display_baseline}
-            onChange={() => dispatch({ type: "toggle_display_baseline" })}
+            checked={state.displayBaseline}
+            onChange={() => dispatch({ type: "toggleDisplayBaseline" })}
           />
           <span>Display baseline</span>
         </label>
         <label className="config-check">
           <input
             type="checkbox"
-            checked={state.auto_peak_picking}
-            onChange={() => dispatch({ type: "toggle_auto_peak_picking" })}
+            checked={state.autoPeakPicking}
+            onChange={() => dispatch({ type: "toggleAutoPeakPicking" })}
           />
           <span>Auto peak picking</span>
         </label>
@@ -115,9 +115,9 @@ export const ConfigPanel = memo(function ConfigPanel() {
           <span className="config-label">RT from</span>
           <input
             type="number"
-            value={state.rt_from}
+            value={state.rtFrom}
             onChange={(event) =>
-              dispatch({ type: "set_rt_from", value: Number(event.target.value) })
+              dispatch({ type: "setRtFrom", value: Number(event.target.value) })
             }
           />
         </label>
@@ -125,8 +125,8 @@ export const ConfigPanel = memo(function ConfigPanel() {
           <span className="config-label">RT to</span>
           <input
             type="number"
-            value={state.rt_to}
-            onChange={(event) => dispatch({ type: "set_rt_to", value: Number(event.target.value) })}
+            value={state.rtTo}
+            onChange={(event) => dispatch({ type: "setRtTo", value: Number(event.target.value) })}
           />
         </label>
         <label className="config-field">
@@ -134,7 +134,7 @@ export const ConfigPanel = memo(function ConfigPanel() {
           <input
             type="number"
             value={state.ppm}
-            onChange={(event) => dispatch({ type: "set_ppm", value: Number(event.target.value) })}
+            onChange={(event) => dispatch({ type: "setPpm", value: Number(event.target.value) })}
           />
         </label>
         <label className="config-field">
@@ -142,9 +142,9 @@ export const ConfigPanel = memo(function ConfigPanel() {
           <input
             type="number"
             step="0.001"
-            value={state.mz_tol}
+            value={state.mzTol}
             onChange={(event) =>
-              dispatch({ type: "set_mz_tol", value: Number(event.target.value) })
+              dispatch({ type: "setMzTol", value: Number(event.target.value) })
             }
           />
         </label>
@@ -157,12 +157,12 @@ export const ConfigPanel = memo(function ConfigPanel() {
           type="number"
           step="0.0001"
           value={explore}
-          onChange={(event) => set_explore(event.target.value)}
+          onChange={(event) => setExplore(event.target.value)}
         />
         <button
           type="button"
           className="run-button"
-          onClick={() => dispatch({ type: "change_mz", value: explore })}
+          onClick={() => dispatch({ type: "changeMz", value: explore })}
         >
           Run
         </button>

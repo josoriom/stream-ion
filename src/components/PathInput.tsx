@@ -15,13 +15,13 @@ export const PathInput = memo(function PathInput({ path }: PathInputProps) {
           type="text"
           value={path}
           spellCheck={false}
-          onChange={(event) => dispatch({ type: "set_path", path: event.target.value })}
+          onChange={(event) => dispatch({ type: "setPath", path: event.target.value })}
         />
         <button
           type="button"
           className="reload-button"
           title="Reload files"
-          onClick={() => dispatch({ type: "reload_samples" })}
+          onClick={() => dispatch({ type: "reloadSamples" })}
         >
           ⟳
         </button>

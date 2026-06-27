@@ -18,7 +18,7 @@ export const ModeSwitch = memo(function ModeSwitch() {
           key={item.value}
           type="button"
           className={state.mode === item.value ? "mode-button active" : "mode-button"}
-          onClick={() => dispatch({ type: "set_mode", mode: item.value })}
+          onClick={() => dispatch({ type: "setMode", mode: item.value })}
         >
           {item.label}
         </button>

@@ -3,12 +3,12 @@ import { useAppDispatch } from "../context/context";
 
 interface SampleListProps {
   samples: string[];
-  selected_sample: string | null;
+  selectedSample: string | null;
 }
 
 export const SampleList = memo(function SampleList({
   samples,
-  selected_sample,
+  selectedSample,
 }: SampleListProps) {
   const dispatch = useAppDispatch();
   if (samples.length === 0) {
@@ -17,14 +17,14 @@ export const SampleList = memo(function SampleList({
   return (
     <ul className="sample-list">
       {samples.map((name) => {
-        const is_active = name === selected_sample;
+        const isActive = name === selectedSample;
         return (
           <li key={name}>
             <button
               type="button"
-              className={is_active ? "sample-item active" : "sample-item"}
+              className={isActive ? "sample-item active" : "sample-item"}
               title={name}
-              onClick={() => dispatch({ type: "pick_sample", name })}
+              onClick={() => dispatch({ type: "pickSample", name })}
             >
               {name}
             </button>

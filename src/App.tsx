@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { compounds } from "./data/compounds";
-import { get_peaks } from "./ms/peaks";
-import { get_baseline } from "./ms/baseline";
+import { getPeaks } from "./ms/peaks";
+import { getBaseline } from "./ms/baseline";
 import { PathInput } from "./components/PathInput";
 import { SampleList } from "./components/SampleList";
 import { CompoundList } from "./components/CompoundList";
@@ -14,65 +14,65 @@ import { ImageView } from "./components/ImageView";
 import { ImageTargets } from "./components/ImageTargets";
 import { RamMeter } from "./components/RamMeter";
 import { useAppDispatch, useAppState } from "./context/context";
-import { active_path, peak_options, select_view } from "./context/reducer";
+import { activePath, peakOptions, selectView } from "./context/reducer";
 import "./App.css";
 
 function App() {
   const state = useAppState();
   const dispatch = useAppDispatch();
-  const view = select_view(state);
+  const view = selectView(state);
   const imaging = state.mode === "imaging";
 
   const baseline = useMemo(
-    () => (state.display_baseline && view.eic_ready ? get_baseline(view.points) : null),
-    [state.display_baseline, view.eic_ready, view.points],
+    () => (state.displayBaseline && view.eicReady ? getBaseline(view.points) : null),
+    [state.displayBaseline, view.eicReady, view.points],
   );
 
-  const annotate_rt = state.annotate && state.target_rt !== null ? state.target_rt : null;
+  const annotateRt = state.annotate && state.targetRt !== null ? state.targetRt : null;
 
-  function run_peak_picking() {
-    if (!view.eic_ready) return;
-    const list = get_peaks(view.points, peak_options(state));
-    dispatch({ type: "peaks_found", key: `${view.url}|${view.mz}`, list });
+  function runPeakPicking() {
+    if (!view.eicReady) return;
+    const list = getPeaks(view.points, peakOptions(state));
+    dispatch({ type: "peaksFound", key: `${view.url}|${view.mz}`, list });
   }
 
   return (
     <div className="app">
       <aside
-        className={state.samples_open ? "sidebar left" : "sidebar left closed"}
-        style={state.samples_open ? { width: state.samples_width } : undefined}
+        className={state.samplesOpen ? "sidebar left" : "sidebar left closed"}
+        style={state.samplesOpen ? { width: state.samplesWidth } : undefined}
       >
         <div className="sidebar-head">
-          {state.samples_open && <span className="sidebar-label">Samples</span>}
-          {state.samples_open && (
+          {state.samplesOpen && <span className="sidebar-label">Samples</span>}
+          {state.samplesOpen && (
             <span className="sidebar-count">{view.samples.length}</span>
           )}
           <button
             type="button"
             className="sidebar-toggle"
-            title={state.samples_open ? "Hide samples" : "Show samples"}
-            onClick={() => dispatch({ type: "toggle_samples" })}
+            title={state.samplesOpen ? "Hide samples" : "Show samples"}
+            onClick={() => dispatch({ type: "toggleSamples" })}
           >
-            {state.samples_open ? "‹" : "›"}
+            {state.samplesOpen ? "‹" : "›"}
           </button>
         </div>
-        {state.samples_open && (
+        {state.samplesOpen && (
           <div className="sidebar-body">
-            <PathInput path={active_path(state)} />
-            {view.samples_failed && (
-              <p className="banner banner-error">Could not list samples: {view.samples_message}</p>
+            <PathInput path={activePath(state)} />
+            {view.samplesFailed && (
+              <p className="banner banner-error">Could not list samples: {view.samplesMessage}</p>
             )}
-            {view.samples_loading && <p className="banner">Loading samples…</p>}
-            {!view.samples_loading && !view.samples_failed && (
-              <SampleList samples={view.samples} selected_sample={view.active_sample} />
+            {view.samplesLoading && <p className="banner">Loading samples…</p>}
+            {!view.samplesLoading && !view.samplesFailed && (
+              <SampleList samples={view.samples} selectedSample={view.activeSample} />
             )}
           </div>
         )}
       </aside>
 
-      {state.samples_open && (
+      {state.samplesOpen && (
         <ResizeHandle
-          on_resize={(cursor_x) => dispatch({ type: "set_samples_width", value: cursor_x })}
+          onResize={(cursorX) => dispatch({ type: "setSamplesWidth", value: cursorX })}
         />
       )}
 
@@ -84,19 +84,19 @@ function App() {
             </h1>
             <p className="content-sub">
               {imaging
-                ? `${view.active_sample ?? "Pick a file"} · ${state.image_targets.length} targets`
-                : view.active_sample
-                  ? `${view.active_sample} · m/z ${state.mz_text}`
+                ? `${view.activeSample ?? "Pick a file"} · ${state.imageTargets.length} targets`
+                : view.activeSample
+                  ? `${view.activeSample} · m/z ${state.mzText}`
                   : "Pick a sample"}
             </p>
           </div>
           <ModeSwitch />
-          {!imaging && !state.auto_peak_picking && (
+          {!imaging && !state.autoPeakPicking && (
             <button
               type="button"
               className="run-button"
-              disabled={!view.eic_ready}
-              onClick={run_peak_picking}
+              disabled={!view.eicReady}
+              onClick={runPeakPicking}
             >
               ▶ Run peak picking
             </button>
@@ -105,71 +105,71 @@ function App() {
 
         <div className="content-body">
           {imaging && <ImageView />}
-          {!imaging && view.active_sample && (
+          {!imaging && view.activeSample && (
             <section className="plot-card">
-              {!view.mz_valid && <p className="banner">Enter a valid m/z</p>}
-              {view.file_failed && (
-                <p className="banner banner-error">Could not read the file: {view.file_message}</p>
+              {!view.mzValid && <p className="banner">Enter a valid m/z</p>}
+              {view.fileFailed && (
+                <p className="banner banner-error">Could not read the file: {view.fileMessage}</p>
               )}
-              {view.eic_failed && (
+              {view.eicFailed && (
                 <p className="banner banner-error">
-                  Could not build the chromatogram: {view.eic_message}
+                  Could not build the chromatogram: {view.eicMessage}
                 </p>
               )}
-              {view.eic_loading && <p className="banner">Building the chromatogram…</p>}
-              {view.eic_ready && (
+              {view.eicLoading && <p className="banner">Building the chromatogram…</p>}
+              {view.eicReady && (
                 <EicPlot
                   points={view.points}
                   peaks={view.peaks}
                   baseline={baseline}
-                  annotate_rt={annotate_rt}
+                  annotateRt={annotateRt}
                 />
               )}
             </section>
           )}
 
-          {!imaging && view.peaks_ready && <PeakTable peaks={view.peaks} />}
+          {!imaging && view.peaksReady && <PeakTable peaks={view.peaks} />}
         </div>
       </main>
 
-      {state.metabolites_open && (
+      {state.metabolitesOpen && (
         <ResizeHandle
-          on_resize={(cursor_x) =>
-            dispatch({ type: "set_metabolites_width", value: window.innerWidth - cursor_x })
+          onResize={(cursorX) =>
+            dispatch({ type: "setMetabolitesWidth", value: window.innerWidth - cursorX })
           }
         />
       )}
 
       <aside
-        className={state.metabolites_open ? "sidebar right" : "sidebar right closed"}
-        style={state.metabolites_open ? { width: state.metabolites_width } : undefined}
+        className={state.metabolitesOpen ? "sidebar right" : "sidebar right closed"}
+        style={state.metabolitesOpen ? { width: state.metabolitesWidth } : undefined}
       >
         <div className="sidebar-head">
           <button
             type="button"
             className="sidebar-toggle"
-            title={state.metabolites_open ? "Hide metabolites" : "Show metabolites"}
-            onClick={() => dispatch({ type: "toggle_metabolites" })}
+            title={state.metabolitesOpen ? "Hide metabolites" : "Show metabolites"}
+            onClick={() => dispatch({ type: "toggleMetabolites" })}
           >
-            {state.metabolites_open ? "›" : "‹"}
+            {state.metabolitesOpen ? "›" : "‹"}
           </button>
-          {state.metabolites_open && (
+          {state.metabolitesOpen && (
             <span className="sidebar-label">{imaging ? "Targets" : "Metabolites"}</span>
           )}
-          {state.metabolites_open && (
+          {state.metabolitesOpen && (
             <span className="sidebar-count">
-              {imaging ? state.image_targets.length : compounds.length}
+              {imaging ? state.imageTargets.length : compounds.length}
             </span>
           )}
         </div>
-        {state.metabolites_open && (
+        {state.metabolitesOpen && (
           <div className="sidebar-body">
             {imaging ? (
               <ImageTargets />
             ) : (
               <>
                 <ConfigPanel />
-                <CompoundList compounds={compounds} selected_label={state.picked_label} />
+                <CompoundList compounds={compounds} selectedLabel={state.pickedLabel} />
               </>
             )}
           </div>

@@ -2,7 +2,7 @@ import { memo } from "react";
 import { useAppState } from "../context/context";
 
 export const ComputeProgress = memo(function ComputeProgress() {
-  const progress = useAppState().image_progress;
+  const progress = useAppState().imageProgress;
 
   if (!progress || progress.total === 0) {
     return (

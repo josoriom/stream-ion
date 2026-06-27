@@ -1,9 +1,9 @@
-const remote_host = 'http://134.115.48.123';
-const proxy_prefix = '/remote';
+const remoteHost = 'http://134.115.48.123';
+const proxyPrefix = '/remote';
 
-export function to_fetchable(url: string): string {
-  if (import.meta.env.DEV && url.startsWith(remote_host)) {
-    return proxy_prefix + url.slice(remote_host.length);
+export function toFetchable(url: string): string {
+  if (import.meta.env.DEV && url.startsWith(remoteHost)) {
+    return proxyPrefix + url.slice(remoteHost.length);
   }
   return url;
 }

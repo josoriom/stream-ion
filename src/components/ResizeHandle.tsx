@@ -1,13 +1,13 @@
 interface ResizeHandleProps {
-  on_resize: (cursor_x: number) => void;
+  onResize: (cursorX: number) => void;
 }
 
-export function ResizeHandle({ on_resize }: ResizeHandleProps) {
+export function ResizeHandle({ onResize }: ResizeHandleProps) {
   function start() {
     document.body.classList.add("resizing");
 
     function move(event: MouseEvent) {
-      on_resize(event.clientX);
+      onResize(event.clientX);
     }
 
     function stop() {
